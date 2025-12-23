@@ -40,7 +40,7 @@ export const deleteProduct = async (req, res) => {
 
 export const getProduct = async (req, res) => {
     try {
-        const product = await Product.findById(req.params.id);
+        const product = await Product.findOne({ slug: req.params.slug });
         res.status(200).json(product);
     } catch (error) {
         res.status(500).json({ message: "Server error", error });
