@@ -33,7 +33,7 @@ export const register = async (req, res) => {
             userRole: admin.userRole
         }
 
-        const token = jwt.sign(payload, process.env.JWT_SECRET)
+        const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "5h" })
 
         res.status(201).json({ 
             message: "Admin registered successfully",
@@ -67,7 +67,7 @@ export const login = async (req, res) => {
                         userRole: admin.userRole
                     }
 
-                    const token = jwt.sign(payload, process.env.JWT_SECRET)
+                    const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "5h" })
 
                     res.status(200).json({
                         message: "Admin logged in successfully",
