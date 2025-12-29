@@ -6,6 +6,10 @@ const variantSchema = new mongoose.Schema(
             type: String,
             required: true
         },
+        images: {
+            type: [String],
+            default: [],
+        },
         highlights: {
             type: [String],
             default: [],

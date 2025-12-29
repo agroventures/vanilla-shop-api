@@ -27,7 +27,19 @@ export const register = async (req, res) => {
 
         await admin.save();
 
-        res.status(201).json({ message: "Admin registered successfully" });
+        const payload = {
+            email: admin.email,
+            name: admin.name,
+            userRole: admin.userRole
+        }
+
+        const token = jwt.sign(payload, process.env.JWT_SECRET)
+
+        res.status(201).json({ 
+            message: "Admin registered successfully",
+            token: token,
+            role: user.userRole
+         });
     } catch (error) {
         res.status(500).json({ message: "Server error", error });
     }
@@ -60,6 +72,7 @@ export const login = async (req, res) => {
                     res.status(200).json({
                         message: "Admin logged in successfully",
                         token: token,
+                        role: admin.userRole
                     })
                 } else {
                     res.status(401).json({
@@ -68,4 +81,16 @@ export const login = async (req, res) => {
                 }
             }
         })
+}
+
+export const getAdminData = async (req, res) => {
+    try {
+        const token = req.headers.authorization.split(" ")[1]
+        const decodedToken = jwt.verify(token, process.env.JWT_SECRET)
+        const admin = await Admin.findOne({ email: decodedToken.email })
+
+        res.status(200).json({ message: "Admin data fetched successfully", admin })
+    } catch (error) {
+        res.status(500).json({ message: "Server error", error });
+    }
 }

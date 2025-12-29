@@ -20,9 +20,7 @@ export const createProduct = async (req, res) => {
 
 export const updateProduct = async (req, res) => {
     try {
-        const product = await Product.findByIdAndUpdate(req.params.id, req.body, {
-            new: true,
-        });
+        const product = await Product.findOneAndUpdate({ slug: req.params.slug }, req.body, { new: true });
         res.status(200).json({ message: "Product updated successfully", product });
     } catch (error) {
         res.status(500).json({ message: "Server error", error });
