@@ -5,6 +5,7 @@ import dotenv from "dotenv"
 
 import adminRouter from "./routes/adminRouter.js";
 import productRouter from "./routes/productRouter.js";
+import orderRouter from "./routes/orderRouter.js";
 
 dotenv.config()
 
@@ -29,6 +30,7 @@ app.use(express.json())
 //routes
 app.use("/api/admin", adminRouter)
 app.use("/api/products", productRouter)
+app.use("/api/orders", orderRouter)
 
 //server
 app.listen(3000, () => {
