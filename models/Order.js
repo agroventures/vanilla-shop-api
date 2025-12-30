@@ -1,6 +1,10 @@
 import mongoose from "mongoose";
 
 const OrderSchema = new mongoose.Schema({
+    orderId: { 
+        type: String,
+        required: true
+    },
     firstName: {
         type: String,
         required: true,
@@ -41,6 +45,7 @@ const OrderSchema = new mongoose.Schema({
     itemsPrice: { type: Number, required: true },
     shippingPrice: { type: Number, required: true },
     totalPrice: { type: Number, required: true },
+    status: { type: String, default: "pending" },
     createdAt: { type: Date, default: Date.now },
 });
 

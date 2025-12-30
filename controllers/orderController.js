@@ -1,13 +1,47 @@
 import Order from "../models/Order.js";
+import { transporter } from "../utils/transporter.js";
 
 export const createOrder = async (req, res) => {
     try {
+        // Generate new orderId
+        const prevOrder = await Order.findOne().sort({ orderId: -1 });
+        if (prevOrder) {
+            const prevOrderId = prevOrder.orderId.split("-")[1];
+            const newOrderId = parseInt(prevOrderId) + 1;
+            req.body.orderId = "ORD-" + newOrderId;
+        } else {
+            req.body.orderId = "ORD-1000";
+        }
+
+        // Create order
         const order = await Order.create(req.body);
-        res.status(201).json({ message: "Order created successfully", order });
+
+        // Send email
+        const message = {
+            from: process.env.GMAIL_ADDRESS,
+            to: req.body.email,
+            subject: "Order Confirmation",
+            text: `Your order has been placed successfully. Order ID: ${order.orderId}
+            \n\nOrder Items:
+            \n\n${order.orderItems.map(item => `${item.name} - ${item.quantity}`).join("\n")}
+            \n\nTotal Amount: ${order.totalPrice}
+            \n\nThank you for shopping with us!`
+        };
+
+        // Use async/await for sending email
+        await transporter.sendMail(message);
+
+        // Respond after email sent
+        res.status(201).json({
+            message: "Order created successfully",
+            order
+        });
     } catch (error) {
-        res.status(500).json({ message: "Server error", error });
+        console.error("Error creating order:", error);
+        res.status(500).json({ message: "Server error", error: error.message });
     }
 };
+
 
 export const getAllOrders = async (req, res) => {
     try {
@@ -19,8 +53,8 @@ export const getAllOrders = async (req, res) => {
 };
 
 export const getOrder = async (req, res) => {
-    try {
-        const order = await Order.findById(req.params.id);
+    try {        
+        const order = await Order.findOne({ orderId: req.params.orderId });
         res.status(200).json(order);
     } catch (error) {
         res.status(500).json({ message: "Server error", error });

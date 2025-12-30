@@ -6,6 +6,7 @@ import dotenv from "dotenv"
 import adminRouter from "./routes/adminRouter.js";
 import productRouter from "./routes/productRouter.js";
 import orderRouter from "./routes/orderRouter.js";
+import contactRouter from "./routes/contactRouter.js";
 
 dotenv.config()
 
@@ -32,7 +33,9 @@ app.use("/api/admin", adminRouter)
 app.use("/api/products", productRouter)
 app.use("/api/orders", orderRouter)
 
+app.use("/api/contact", contactRouter)
+
 //server
-app.listen(3000, () => {
-    console.log("Server is running on port 3000")
+app.listen(process.env.PORT, () => {
+    console.log(`Server is running on port ${process.env.PORT}`)
 })
