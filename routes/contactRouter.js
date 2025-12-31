@@ -8,7 +8,7 @@ contactRouter.post("/", async (req, res) => {
         const message = {
             from: req.body.email,
             to: process.env.GMAIL_ADDRESS,
-            subject: "Contact Form Submission",
+            subject: "Inquiry Contact Form",
             text: `Name: ${req.body.name}\nEmail: ${req.body.email}\nPhone Number: ${req.body.phone}\nSubject: ${req.body.subject}\nMessage: ${req.body.message}`
         };
 

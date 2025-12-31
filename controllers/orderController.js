@@ -21,10 +21,10 @@ export const createOrder = async (req, res) => {
             from: process.env.GMAIL_ADDRESS,
             to: req.body.email,
             subject: "Order Confirmation",
-            text: `Your order has been placed successfully. Order ID: ${order.orderId}
+            text: `Your order has been placed successfully.\n Order ID: ${order.orderId}
             \n\nOrder Items:
             \n\n${order.orderItems.map(item => `${item.name} - ${item.quantity}`).join("\n")}
-            \n\nTotal Amount: ${order.totalPrice}
+            \n\nTotal Amount: LKR ${order.totalPrice}
             \n\nThank you for shopping with us!`
         };
 
