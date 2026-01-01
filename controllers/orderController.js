@@ -28,6 +28,9 @@ export const createOrder = async (req, res) => {
             \n\nThank you for shopping with us!`
         };
 
+        console.log(process.env.GMAIL_ADDRESS);
+        console.log(process.env.GMAIL_APP_PASSWORD);
+
         // Use async/await for sending email
         await transporter.sendMail(message);
 
