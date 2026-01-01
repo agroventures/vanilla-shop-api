@@ -1,5 +1,6 @@
 import Order from "../models/Order.js";
-import { transporter } from "../utils/transporter.js";
+import { resend } from "../utils/resend.js";
+// import { transporter } from "../utils/transporter.js";
 
 export const createOrder = async (req, res) => {
     try {
@@ -17,22 +18,28 @@ export const createOrder = async (req, res) => {
         const order = await Order.create(req.body);
 
         // Send email
-        const message = {
-            from: process.env.GMAIL_ADDRESS,
+        // const message = {
+        //     from: process.env.GMAIL_ADDRESS,
+        //     to: req.body.email,
+        //     subject: "Order Confirmation",
+        //     text: `Your order has been placed successfully.\n Order ID: ${order.orderId}
+        //     \n\nOrder Items:
+        //     \n\n${order.orderItems.map(item => `${item.name} - ${item.quantity}`).join("\n")}
+        //     \n\nTotal Amount: LKR ${order.totalPrice}
+        //     \n\nThank you for shopping with us!`
+        // };
+
+        // // Use async/await for sending email
+        // await transporter.sendMail(message);
+
+        await resend.emails.send({
+            from: "The Vanilla Shop <info@thevanillashop.lk>",
             to: req.body.email,
             subject: "Order Confirmation",
-            text: `Your order has been placed successfully.\n Order ID: ${order.orderId}
-            \n\nOrder Items:
-            \n\n${order.orderItems.map(item => `${item.name} - ${item.quantity}`).join("\n")}
-            \n\nTotal Amount: LKR ${order.totalPrice}
-            \n\nThank you for shopping with us!`
-        };
-
-        console.log(process.env.GMAIL_ADDRESS);
-        console.log(process.env.GMAIL_APP_PASSWORD);
-
-        // Use async/await for sending email
-        await transporter.sendMail(message);
+            text: `Your order has been placed successfully.\nOrder ID: ${order.orderId}\n\nOrder Items:${order.orderItems
+                .map(item => `${item.name} - ${item.quantity}`)
+                .join("\n")}\n\nTotal Amount: LKR ${order.totalPrice}\n\nThank you for shopping with us!`,
+        });
 
         // Respond after email sent
         res.status(201).json({
@@ -56,7 +63,7 @@ export const getAllOrders = async (req, res) => {
 };
 
 export const getOrder = async (req, res) => {
-    try {        
+    try {
         const order = await Order.findOne({ orderId: req.params.orderId });
         res.status(200).json(order);
     } catch (error) {
@@ -71,12 +78,12 @@ export const updateOrder = async (req, res) => {
     } catch (error) {
         res.status(500).json({ message: "Server error", error });
     }
-}; 
+};
 
 export const deleteOrder = async (req, res) => {
     try {
         const order = await Order.findByIdAndDelete(req.params.id);
-        res.status(200).json({ message: "Order deleted successfully"});
+        res.status(200).json({ message: "Order deleted successfully" });
     } catch (error) {
         res.status(500).json({ message: "Server error", error });
     }
