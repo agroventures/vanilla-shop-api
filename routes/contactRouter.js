@@ -1,6 +1,6 @@
 import express from "express";
 import { resend } from "../utils/resend.js";
-// import { transporter } from "../utils/transporter.js";
+import { transporter } from "../utils/transporter.js";
 
 const contactRouter = express.Router();
 

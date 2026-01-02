@@ -14,10 +14,16 @@ const variantSchema = new mongoose.Schema(
             type: [String],
             default: [],
         },
-        price: { 
+        priceInLKR: { 
             type: Number,
             required: true
         },
+
+        priceInUSD: { 
+            type: Number,
+            required: true
+        },
+        
         weight: { 
             type: String
         },
@@ -83,7 +89,11 @@ const productSchema = new mongoose.Schema(
             default: 0,
         },
 
-        price: {
+        priceInLKR: {
+            type: Number,
+        },
+
+        priceInUSD: {
             type: Number,
         },
 

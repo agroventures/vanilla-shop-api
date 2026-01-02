@@ -38,7 +38,7 @@ export const register = async (req, res) => {
         res.status(201).json({ 
             message: "Admin registered successfully",
             token: token,
-            role: user.userRole
+            role: admin.userRole
          });
     } catch (error) {
         res.status(500).json({ message: "Server error", error });
