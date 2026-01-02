@@ -1,4 +1,5 @@
 import Order from "../models/Order.js";
+import { generateInvoicePDF } from "../utils/generateInvoicePDF.js";
 import { resend } from "../utils/resend.js";
 // import { transporter } from "../utils/transporter.js";
 
@@ -31,14 +32,29 @@ export const createOrder = async (req, res) => {
 
         // // Use async/await for sending email
         // await transporter.sendMail(message);
+        const pdfBuffer = await generateInvoicePDF(order);
+
+        // await resend.emails.send({
+        //     from: "The Vanilla Shop <info@thevanillashop.lk>",
+        //     to: req.body.email,
+        //     subject: "Order Confirmation",
+        //     text: `Your order has been placed successfully.\nOrder ID: ${order.orderId}\n\nOrder Items:${order.orderItems
+        //         .map(item => `${item.name} - ${item.quantity}`)
+        //         .join("\n")}\n\nTotal Amount: LKR ${order.totalPrice}\n\nThank you for shopping with us!`,
+        // });
 
         await resend.emails.send({
             from: "The Vanilla Shop <info@thevanillashop.lk>",
-            to: req.body.email,
-            subject: "Order Confirmation",
-            text: `Your order has been placed successfully.\nOrder ID: ${order.orderId}\n\nOrder Items:${order.orderItems
-                .map(item => `${item.name} - ${item.quantity}`)
-                .join("\n")}\n\nTotal Amount: LKR ${order.totalPrice}\n\nThank you for shopping with us!`,
+            to: order.email,
+            subject: "Order Confirmed – Invoice Attached",
+            html: `\n<h2>Thank you for your order 🎉</h2>\n<p>Your order <b>#${order.orderId}</b> was placed successfully.</p>\n<p>Your invoice is attached as a PDF.</p>`,
+            attachments: [
+                {
+                    filename: `invoice-${order.orderId}.pdf`,
+                    content: pdfBuffer,
+                    contentType: "application/pdf",
+                },
+            ],
         });
 
         // Respond after email sent
