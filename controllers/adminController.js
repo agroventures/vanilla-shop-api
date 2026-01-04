@@ -45,43 +45,109 @@ export const register = async (req, res) => {
     }
 };
 
+// export const login = async (req, res) => {
+//     const email = req.body.email
+//     const password = req.body.password
+
+//     Admin.find({ email: email }).then(
+//         (admins) => {
+//             if (admins[0] == null) {
+//                 res.status(404).json({
+//                     "message": "User not found"
+//                 })
+//             } else {
+//                 const admin = admins[0]
+
+//                 const isPasswordCorrect = bcrypt.compareSync(password, admin.password)
+
+//                 if (isPasswordCorrect) {
+//                     const payload = {
+//                         email: admin.email,
+//                         name: admin.name,
+//                         userRole: admin.userRole
+//                     }
+
+//                     const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "5h" })
+
+//                     res.status(200).json({
+//                         message: "Admin logged in successfully",
+//                         token: token,
+//                         role: admin.userRole
+//                     })
+//                 } else {
+//                     res.status(401).json({
+//                         message: "Wrong password"
+//                     })
+//                 }
+//             }
+//         })
+// }
+
+//new
 export const login = async (req, res) => {
-    const email = req.body.email
-    const password = req.body.password
+    try {
+        const { email, password } = req.body;
 
-    Admin.find({ email: email }).then(
-        (admins) => {
-            if (admins[0] == null) {
-                res.status(404).json({
-                    "message": "User not found"
-                })
-            } else {
-                const admin = admins[0]
+        const admin = await Admin.findOne({ email });
 
-                const isPasswordCorrect = bcrypt.compareSync(password, admin.password)
+        if (!admin) {
+            return res.status(404).json({
+                message: "User not found"
+            });
+        }
 
-                if (isPasswordCorrect) {
-                    const payload = {
-                        email: admin.email,
-                        name: admin.name,
-                        userRole: admin.userRole
-                    }
+        const isPasswordCorrect = bcrypt.compareSync(password, admin.password);
 
-                    const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "5h" })
+        if (!isPasswordCorrect) {
+            return res.status(401).json({
+                message: "Wrong password"
+            });
+        }
 
-                    res.status(200).json({
-                        message: "Admin logged in successfully",
-                        token: token,
-                        role: admin.userRole
-                    })
-                } else {
-                    res.status(401).json({
-                        message: "Wrong password"
-                    })
-                }
-            }
-        })
-}
+        const payload = {
+            id: admin._id,
+            email: admin.email,
+            role: admin.userRole
+        };
+
+        const token = jwt.sign(
+            payload,
+            process.env.JWT_SECRET,
+            { expiresIn: "1h" } // 🔑 1 hour
+        );
+
+        // 🍪 Set HttpOnly cookie
+        res.cookie("accessToken", token, {
+            httpOnly: true,
+            secure: true,        // HTTPS only
+            sameSite: "strict",
+            maxAge: 60 * 60 * 1000 // 1 hour
+            // ❗ remove maxAge if you want logout on browser close
+        });
+
+        res.status(200).json({
+            message: "Admin logged in successfully",
+            role: admin.userRole
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            message: "Server error"
+        });
+    }
+};
+
+//new
+export const logout = (req, res) => {
+    res.clearCookie("accessToken", {
+        httpOnly: true,
+        secure: true,
+        sameSite: "strict"
+    });
+
+    res.status(200).json({ message: "Logged out" });
+};
+
 
 export const getAdminData = async (req, res) => {
     try {
