@@ -68,7 +68,19 @@ export const getOrder = async (req, res) => {
 
 export const updateOrder = async (req, res) => {
     try {
-        const order = await Order.findOneAndUpdate({ _id: req.params.id }, req.body, { new: true });
+        const order = await Order.findOne({ _id: req.params.id });
+        const oldStatus = order.status;
+
+        order.status = req.body.status;
+        await order.save();
+
+        await resend.emails.send({
+            from: "The Vanilla Shop <info@thevanillashop.lk>",
+            to: order.email,
+            subject: "Your Order Status Has Been Updated",
+            text: `Hello,\n\nYour order status has been updated.\n\nOrder ID: ${order.orderId}\nStatus: ${oldStatus} → ${order.status}\n\nThank you for shopping with The Vanilla Shop!\n\n– The Vanilla Shop`,
+        });
+
         res.status(200).json({ message: "Order updated successfully", order });
     } catch (error) {
         res.status(500).json({ message: "Server error", error });
