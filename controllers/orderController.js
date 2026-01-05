@@ -18,30 +18,7 @@ export const createOrder = async (req, res) => {
         // Create order
         const order = await Order.create(req.body);
 
-        // Send email
-        // const message = {
-        //     from: process.env.GMAIL_ADDRESS,
-        //     to: req.body.email,
-        //     subject: "Order Confirmation",
-        //     text: `Your order has been placed successfully.\n Order ID: ${order.orderId}
-        //     \n\nOrder Items:
-        //     \n\n${order.orderItems.map(item => `${item.name} - ${item.quantity}`).join("\n")}
-        //     \n\nTotal Amount: LKR ${order.totalPrice}
-        //     \n\nThank you for shopping with us!`
-        // };
-
-        // // Use async/await for sending email
-        // await transporter.sendMail(message);
         const pdfBuffer = await generateInvoicePDF(order);
-
-        // await resend.emails.send({
-        //     from: "The Vanilla Shop <info@thevanillashop.lk>",
-        //     to: req.body.email,
-        //     subject: "Order Confirmation",
-        //     text: `Your order has been placed successfully.\nOrder ID: ${order.orderId}\n\nOrder Items:${order.orderItems
-        //         .map(item => `${item.name} - ${item.quantity}`)
-        //         .join("\n")}\n\nTotal Amount: LKR ${order.totalPrice}\n\nThank you for shopping with us!`,
-        // });
 
         await resend.emails.send({
             from: "The Vanilla Shop <info@thevanillashop.lk>",
@@ -71,6 +48,8 @@ export const createOrder = async (req, res) => {
 
 export const getAllOrders = async (req, res) => {
     try {
+        // check token cause otherwise it will return all orders
+
         const orders = await Order.find();
         res.status(200).json(orders);
     } catch (error) {
