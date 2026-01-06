@@ -78,7 +78,8 @@ export const updateOrder = async (req, res) => {
             from: "The Vanilla Shop <info@thevanillashop.lk>",
             to: order.email,
             subject: "Your Order Status Has Been Updated",
-            text: `Hello,\n\nYour order status has been updated.\n\nOrder ID: ${order.orderId}\nStatus: ${oldStatus} → ${order.status}\n\nThank you for shopping with The Vanilla Shop!\n\n– The Vanilla Shop`,
+            text: `Hello,\n\nWe wanted to let you know that the status of your order has been updated.\n\n────────────────────────────\nORDER DETAILS\n────────────────────────────\nOrder ID   : ${order.orderId}\nStatus    : ${oldStatus} → ${order.status}\n────────────────────────────\n\nThank you for shopping with The Vanilla Shop.\nWe truly appreciate your trust and support 🤍\n\nIf you have any questions, simply reply to this email — we’re happy to help.\n\nWarm regards,\nThe Vanilla Shop Team\nSri Lanka 🇱🇰
+`,
         });
 
         res.status(200).json({ message: "Order updated successfully", order });
