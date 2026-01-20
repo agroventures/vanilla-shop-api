@@ -17,9 +17,9 @@ simpleRouter.get("/sitemap.xml", async (req, res) => {
     smStream.write({ url: "/shop", changefreq: "daily", priority: 0.9 });
     smStream.write({ url: "/about", changefreq: "monthly", priority: 0.5 });
     smStream.write({ url: "/contact", changefreq: "monthly", priority: 0.5 });
-    sitemap.write({ url: "/privacy", changefreq: "monthly", priority: 0.6 });
-    sitemap.write({ url: "/terms", changefreq: "monthly", priority: 0.6 });
-    sitemap.write({ url: "/refund", changefreq: "monthly", priority: 0.6 });
+    smStream.write({ url: "/privacy", changefreq: "monthly", priority: 0.6 });
+    smStream.write({ url: "/terms", changefreq: "monthly", priority: 0.6 });
+    smStream.write({ url: "/refund", changefreq: "monthly", priority: 0.6 });
 
     // 🔹 Products
     const products = await Product.find({}, "slug updatedAt");
