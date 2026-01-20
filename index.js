@@ -7,6 +7,7 @@ import adminRouter from "./routes/adminRouter.js";
 import productRouter from "./routes/productRouter.js";
 import orderRouter from "./routes/orderRouter.js";
 import contactRouter from "./routes/contactRouter.js";
+import simpleRouter from "./routes/sitemap.js";
 
 dotenv.config()
 
@@ -29,6 +30,7 @@ app.use(cors())
 app.use(express.json())
 
 //routes
+app.use("/", simpleRouter);
 app.use("/api/admin", adminRouter)
 app.use("/api/products", productRouter)
 app.use("/api/orders", orderRouter)
