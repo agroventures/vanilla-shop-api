@@ -4,7 +4,7 @@ import Product from '../models/Product.js'
 
 const simpleRouter = express.Router();
 
-router.get("/sitemap.xml", async (req, res) => {
+simpleRouter.get("/sitemap.xml", async (req, res) => {
   try {
     res.header("Content-Type", "application/xml");
 
