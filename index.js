@@ -8,6 +8,7 @@ import productRouter from "./routes/productRouter.js";
 import orderRouter from "./routes/orderRouter.js";
 import contactRouter from "./routes/contactRouter.js";
 import simpleRouter from "./routes/sitemap.js";
+import paymentRouter from "./routes/paymentRoutes.js";
 
 dotenv.config()
 
@@ -34,7 +35,7 @@ app.use("/", simpleRouter);
 app.use("/api/admin", adminRouter)
 app.use("/api/products", productRouter)
 app.use("/api/orders", orderRouter)
-
+app.use("/api/payments", paymentRouter);
 app.use("/api/contact", contactRouter)
 
 //server
