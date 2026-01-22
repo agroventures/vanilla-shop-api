@@ -1,8 +1,11 @@
+import { log } from "console";
 import { signPayload, paycenterRequest } from "../utils/paycenter.js";
 
 export const initPayment = async (req, res) => {
   try {
     const { amount, currency, orderId } = req.body;
+
+    let clientIdNew = null;
 
     if (currency === "USD") {
       clientIdNew = process.env.PAYCENTER_CLIENT_ID_USD;
@@ -13,18 +16,18 @@ export const initPayment = async (req, res) => {
     const payload = {
       clientId: Number(clientIdNew),
       type: "PURCHASE",
-      tokenize: true,
+      tokenize: true, // false not saving card details
       amount: {
         paymentAmount: amount,
         currency: currency,
       },
       redirect: {
-        returnUrl: `${process.env.FRONTEND_URL}/payment-return`,
+        returnUrl: `${process.env.FRONTEND_URL}/payment/return`,
         returnMethod: "GET",
       },
       clientRef: orderId,
       comment: "Vanilla Shop Order",
-    };
+    };    
 
     const signature = signPayload(
       payload,
