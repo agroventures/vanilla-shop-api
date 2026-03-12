@@ -1,4 +1,5 @@
 import Order from "../models/Order.js";
+import { agentPDF } from "../utils/agentPDF.js";
 import { generateInvoicePDF } from "../utils/generateInvoicePDF.js";
 import { resend } from "../utils/resend.js";
 // import { transporter } from "../utils/transporter.js";
@@ -23,12 +24,42 @@ export const createOrder = async (req, res) => {
         await resend.emails.send({
             from: "The Vanilla Shop <info@thevanillashop.lk>",
             to: order.email,
-            subject: "Order Confirmed – Invoice Attached",
-            html: `\n<h2>Thank you for your order 🎉</h2>\n<p>Your order <b>#${order.orderId}</b> was placed successfully.</p>\n<p>Your invoice is attached as a PDF.</p>`,
+            // subject: "Order Confirmed – Invoice Attached",
+            // html: `\n<h2>Thank you for your order 🎉</h2>\n<p>Your order <b>#${order.orderId}</b> was placed successfully.</p>\n<p>Your invoice is attached as a PDF.</p>`,
+            // attachments: [
+            //     {
+            //         filename: `invoice-${order.orderId}.pdf`,
+            //         content: pdfBuffer,
+            //         contentType: "application/pdf",
+            //     },
+            // ],
+
+            subject: "Order Placed Successfully",
+            html: `<h2>Thank you for your order 🎉</h2>
+<p>Your order <b>#${order.orderId}</b> has been placed successfully.</p>
+<p>Our agent will contact you shortly to confirm the details and arrange delivery.</p>
+<p>We appreciate your business!</p>`,
+        });
+
+
+        ////////////////////////////////////
+        const itemsHtml = (order.orderItems || [])
+            .map(item => `<li>${item.name} x ${item.quantity}</li>`)
+            .join('');
+
+        const pdfBuffer2 = await agentPDF(order);
+
+        // Notify agent
+        await resend.emails.send({
+            from: "The Vanilla Shop <info@thevanillashop.lk>",
+            // to: "info@agroventures.digital",
+            to: "lakshitha@agroventures.lk",
+            subject: "New Order Received – Action Required",
+            html: `<p>Please contact the customer to confirm the order details and arrange delivery.</p>`,
             attachments: [
                 {
                     filename: `invoice-${order.orderId}.pdf`,
-                    content: pdfBuffer,
+                    content: pdfBuffer2,
                     contentType: "application/pdf",
                 },
             ],
