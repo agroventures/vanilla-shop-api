@@ -17,8 +17,8 @@ export function agentPDF(order) {
        .text("THE VANILLA SHOP", { align: "right" });
     
     doc.fontSize(10)
-       .text("123 Gourmet Lane, Colombo", { align: "right" })
-       .text("contact@vanillashop.lk", { align: "right" })
+       .text("No. 253, Koswatta, Kaduwela Road, Battaramulla", { align: "right" })
+       .text("info@thevanillashop.lk", { align: "right" })
        .moveDown();
 
     // Horizontal Line
