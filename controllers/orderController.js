@@ -19,51 +19,7 @@ export const createOrder = async (req, res) => {
         // Create order
         const order = await Order.create(req.body);
 
-        const pdfBuffer = await generateInvoicePDF(order);
-
-        await resend.emails.send({
-            from: "The Vanilla Shop <info@thevanillashop.lk>",
-            to: order.email,
-            // subject: "Order Confirmed – Invoice Attached",
-            // html: `\n<h2>Thank you for your order 🎉</h2>\n<p>Your order <b>#${order.orderId}</b> was placed successfully.</p>\n<p>Your invoice is attached as a PDF.</p>`,
-            // attachments: [
-            //     {
-            //         filename: `invoice-${order.orderId}.pdf`,
-            //         content: pdfBuffer,
-            //         contentType: "application/pdf",
-            //     },
-            // ],
-
-            subject: "Order Placed Successfully",
-            html: `<h2>Thank you for your order 🎉</h2>
-<p>Your order <b>#${order.orderId}</b> has been placed successfully.</p>
-<p>Our agent will contact you shortly to confirm the details and arrange delivery.</p>
-<p>We appreciate your business!</p>`,
-        });
-
-
-        ////////////////////////////////////
-        const itemsHtml = (order.orderItems || [])
-            .map(item => `<li>${item.name} x ${item.quantity}</li>`)
-            .join('');
-
-        const pdfBuffer2 = await agentPDF(order);
-
-        // Notify agent
-        await resend.emails.send({
-            from: "The Vanilla Shop <info@thevanillashop.lk>",
-            // to: "info@agroventures.digital",
-            to: ["lakshitha@agroventures.lk","shanila@agroventures.digital"],
-            subject: "New Order Received – Action Required",
-            html: `<p>Please contact the customer to confirm the order details and arrange delivery.</p>`,
-            attachments: [
-                {
-                    filename: `invoice-${order.orderId}.pdf`,
-                    content: pdfBuffer2,
-                    contentType: "application/pdf",
-                },
-            ],
-        });
+        
 
         // Respond after email sent
         res.status(201).json({
