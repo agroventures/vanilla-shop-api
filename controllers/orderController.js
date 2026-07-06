@@ -53,8 +53,8 @@ export const createOrder = async (req, res) => {
         await resend.emails.send({
             from: "The Vanilla Shop <info@thevanillashop.lk>",
             // to: "info@agroventures.digital",
-            // to: ["lakshitha@agroventures.lk"],
-            to: "ventraxdigital@gmail.com",
+            to: ["lakshitha@agroventures.lk"],
+            // to: "ventraxdigital@gmail.com",
             subject: "New Order Received – Action Required",
             html: `<p>Please contact the customer to confirm the order details and arrange delivery.</p>`,
             attachments: [
