@@ -2,6 +2,7 @@ import express from "express"
 import mongoose from "mongoose"
 import cors from "cors"
 import dotenv from "dotenv"
+import dns from "node:dns/promises";
 
 import adminRouter from "./routes/adminRouter.js";
 import productRouter from "./routes/productRouter.js";
@@ -11,6 +12,8 @@ import simpleRouter from "./routes/sitemap.js";
 import paymentRouter from "./routes/paymentRoutes.js";
 
 dotenv.config()
+
+dns.setServers(["1.1.1.1"]);
 
 const mongoURI = process.env.MONGO_URL
 
