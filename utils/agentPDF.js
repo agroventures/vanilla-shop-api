@@ -40,10 +40,18 @@ export function agentPDF(order) {
        .text(`Email: ${order.email}`)
        .text(`Phone: ${order.phone || "N/A"}`);
 
+    // --- Shipping Address ---
+    doc.fontSize(12).font("Helvetica-Bold").text("Ship To:", 300, 200);
+    doc.font("Helvetica").fontSize(10)
+       .text(order.shippingAddress?.street || "N/A", 300)
+       .text(`${order.shippingAddress?.city || ""}, ${order.shippingAddress?.state || ""}`.trim().replace(/^,|,$/g, "") || "N/A", 300)
+       .text(order.shippingAddress?.postalCode || "", 300)
+       .text(order.shippingAddress?.country || "", 300);
+
     doc.moveDown(2);
 
     // --- Table Header ---
-    const tableTop = 280;
+    const tableTop = 300;
     doc.font("Helvetica-Bold");
     generateTableRow(doc, tableTop, "Item Description", "Qty", "Unit Price", "Total");
     
