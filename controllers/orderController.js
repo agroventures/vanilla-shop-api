@@ -7,18 +7,48 @@ import { resend } from "../utils/resend.js";
 export const createOrder = async (req, res) => {
     try {
         // Generate new orderId
-        const prevOrder = await Order.findOne().sort({ orderId: -1 });
-        if (prevOrder) {
-            const prevOrderId = prevOrder.orderId.split("-")[1];
-            const newOrderId = parseInt(prevOrderId) + 1;
-            req.body.orderId = "ORD-" + newOrderId;
-        } else {
-            req.body.orderId = "ORD-1000";
-        }
+        const newOrderId = await generateNextOrderId();
+        req.body.orderId = newOrderId;
 
         // Create order
         const order = await Order.create(req.body);
 
+        // send email to client
+        sendEmailToClient(order);
+
+        ////////////////////////////////////
+        const itemsHtml = (order.orderItems || [])
+            .map(item => `<li>${item.name} x ${item.quantity}</li>`)
+            .join('');
+
+        // send email to agent
+        sendEmailToAgent(order);
+
+        // Respond after email sent
+        res.status(201).json({
+            message: "Order created successfully",
+            order
+        });
+    } catch (error) {
+        console.error("Error creating order:", error);
+        res.status(500).json({ message: "Server error", error: error.message });
+    }
+};
+
+// Generate next orderId
+export const generateNextOrderId = async () => {
+  const prevOrder = await Order.findOne().sort({ orderId: -1 });
+  if (prevOrder) {
+    const prevOrderId = prevOrder.orderId.split("-")[1];
+    return "ORD-" + (parseInt(prevOrderId) + 1);
+  }
+  return "ORD-1000";
+};
+
+
+// Send email to client
+export const sendEmailToClient = async (order) => {
+    try {
         const pdfBuffer = await generateInvoicePDF(order);
 
         await resend.emails.send({
@@ -40,21 +70,22 @@ export const createOrder = async (req, res) => {
 <p>Our agent will contact you shortly to confirm the details and arrange delivery.</p>
 <p>We appreciate your business!</p>`,
         });
+    } catch (error) {
+        console.error("Error sending email:", error);
+    }
+}
 
-
-        ////////////////////////////////////
-        const itemsHtml = (order.orderItems || [])
-            .map(item => `<li>${item.name} x ${item.quantity}</li>`)
-            .join('');
-
+// Send email to agent
+export const sendEmailToAgent = async (order) => {
+    try {
         const pdfBuffer2 = await agentPDF(order);
 
         // Notify agent
         await resend.emails.send({
             from: "The Vanilla Shop <info@thevanillashop.lk>",
             // to: "info@agroventures.digital",
-            to: ["lakshitha@agroventures.lk"],
-            // to: "ventraxdigital@gmail.com",
+            // to: ["lakshitha@agroventures.lk"],
+            to: "ventraxdigital@gmail.com",
             subject: "New Order Received – Action Required",
             html: `<p>Please contact the customer to confirm the order details and arrange delivery.</p>`,
             attachments: [
@@ -65,17 +96,10 @@ export const createOrder = async (req, res) => {
                 },
             ],
         });
-
-        // Respond after email sent
-        res.status(201).json({
-            message: "Order created successfully",
-            order
-        });
     } catch (error) {
-        console.error("Error creating order:", error);
-        res.status(500).json({ message: "Server error", error: error.message });
+        console.error("Error sending email:", error);
     }
-};
+}
 
 
 export const getAllOrders = async (req, res) => {
@@ -101,10 +125,15 @@ export const getOrder = async (req, res) => {
 export const updateOrder = async (req, res) => {
     try {
         const order = await Order.findOne({ _id: req.params.id });
-        const oldStatus = order.status;
+        let oldStatus = order.status;
 
         order.status = req.body.status;
         await order.save();
+
+        // if status is pending_payment, Change it to pending payment
+        if (oldStatus === "pending_payment") {
+            oldStatus = "pending payment";
+        }
 
         await resend.emails.send({
             from: "The Vanilla Shop <info@thevanillashop.lk>",
