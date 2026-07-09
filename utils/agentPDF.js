@@ -12,9 +12,10 @@ export function agentPDF(order) {
     });
 
     // --- Header & Branding ---
-    doc.fillColor("#444444")
-       .fontSize(20)
-       .text("THE VANILLA SHOP", { align: "right" });
+    doc.image("assets/logo.png", 50, 45, { width: 60 });
+   //  doc.fillColor("#444444")
+   //     .fontSize(20)
+   //     .text("THE VANILLA SHOP", { align: "right" });
     
     doc.fontSize(10)
        .text("No. 253, Koswatta, Kaduwela Road, Battaramulla", { align: "right" })
