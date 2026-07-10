@@ -1,0 +1,22 @@
+name: Cleanup stale orders
+
+on:
+  schedule:
+    - cron: "*/10 * * * *"   # every 10 minutes
+  workflow_dispatch:          # lets you trigger manually from GitHub UI too
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call cleanup endpoint
+        run: |
+          response=$(curl -s -o /tmp/response.json -w "%{http_code}" -X POST \
+            "${{ secrets.RENDER_APP_URL }}/api/cleanup/cleanup-orders" \
+            -H "x-cron-secret: ${{ secrets.CRON_SECRET }}")
+          echo "HTTP status: $response"
+          echo "Response body:"
+          cat /tmp/response.json
+          if [ "$response" -ne 200 ]; then
+            exit 1
+          fi
