@@ -46,6 +46,20 @@ const OrderSchema = new mongoose.Schema({
     shippingPrice: { type: Number, required: true },
     totalPrice: { type: Number, required: true },
     status: { type: String, default: "pending" },
+
+    // --- Payment reconciliation (Paycenter Web) ---
+    // Card orders are created *before* the payment gateway runs, so this is
+    // the only record of whether the card was actually charged. It's updated
+    // by paymentController.receiveCallback once PAYMENT_COMPLETE resolves.
+    paymentStatus: {
+        type: String,
+        enum: ["pending", "paid", "failed"],
+        default: "pending",
+    },
+    paycorpReqid: { type: String }, // Paycorp's reqid for this payment attempt
+    txnReference: { type: String }, // Paycorp's txnReference once approved
+    paidAt: { type: Date },
+
     createdAt: { type: Date, default: Date.now },
 });
 

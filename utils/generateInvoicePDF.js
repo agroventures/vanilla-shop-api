@@ -1,6 +1,9 @@
 import PDFDocument from "pdfkit";
 import fs from "fs";
 import path from "path";
+import { fileURLToPath } from "url";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export const generateInvoicePDF = (order) => {
   return new Promise((resolve, reject) => {
@@ -74,7 +77,7 @@ export const generateInvoicePDF = (order) => {
          HEADER SECTION
       ====================== */
       const headerY = 40;
-      const logoPath = path.join(process.cwd(), "assets/logo.png");
+      const logoPath = path.join(__dirname, "../assets/logo.png");
 
       // Company Info (Left Side)
       if (fs.existsSync(logoPath)) {
