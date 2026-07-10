@@ -180,7 +180,7 @@ export const generateInvoicePDF = (order) => {
 
       const shipping = order.shippingPrice || 0;
       doc.fillColor(colors.lightText).text("Shipping:", totalsX, totalsY)
-        .fillColor(colors.text).text(shipping === 0 ? "FREE" : formatCurrency(shipping), totalsX + 80, totalsY, { width: 120, align: "right" });
+        .fillColor(colors.text).text(shipping === 0 ? "Pending (Agent will contact you)" : formatCurrency(shipping), totalsX + 80, totalsY, { width: 120, align: "right" });
       totalsY += 20;
 
       if (order.tax) {
