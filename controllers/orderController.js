@@ -10,6 +10,9 @@ export const createOrder = async (req, res) => {
         const newOrderId = await generateNextOrderId();
         req.body.orderId = newOrderId;
 
+        // Ensure COD orders always have pending payment status
+        if (req.body.paymentMethod === "cod") req.body.paymentStatus = "pending";
+
         // Create order
         const order = await Order.create(req.body);
 
