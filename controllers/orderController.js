@@ -132,6 +132,10 @@ export const updateOrder = async (req, res) => {
         let oldStatus = order.status;
 
         order.status = req.body.status;
+        if (req.body.status === "delivered" && order.paymentMethod === "cod") {
+            order.paymentStatus = "paid";
+            order.paidAt = new Date();
+        }
         await order.save();
 
         // if status is pending_payment, Change it to pending payment
