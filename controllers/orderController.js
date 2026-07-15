@@ -10,6 +10,9 @@ export const createOrder = async (req, res) => {
         const newOrderId = await generateNextOrderId();
         req.body.orderId = newOrderId;
 
+        // Ensure COD orders always have pending payment status
+        if (req.body.paymentMethod === "cod") req.body.paymentStatus = "pending";
+
         // Create order
         const order = await Order.create(req.body);
 
@@ -54,21 +57,22 @@ export const sendEmailToClient = async (order) => {
         await resend.emails.send({
             from: "The Vanilla Shop <info@thevanillashop.lk>",
             to: order.email,
-            // subject: "Order Confirmed – Invoice Attached",
-            // html: `\n<h2>Thank you for your order 🎉</h2>\n<p>Your order <b>#${order.orderId}</b> was placed successfully.</p>\n<p>Your invoice is attached as a PDF.</p>`,
-            // attachments: [
-            //     {
-            //         filename: `invoice-${order.orderId}.pdf`,
-            //         content: pdfBuffer,
-            //         contentType: "application/pdf",
-            //     },
-            // ],
+            subject: "Order Confirmed – Invoice Attached",
+            html: `\n<h2>Thank you for your order 🎉</h2>\n<p>Your order <b>#${order.orderId}</b> was placed successfully.</p>\n<p>Your invoice is attached as a PDF.</p>`,
+            attachments: [
+                {
+                    filename: `invoice-${order.orderId}.pdf`,
+                    content: pdfBuffer,
+                    contentType: "application/pdf",
+                },
+            ],
+        
 
-            subject: "Order Placed Successfully",
-            html: `<h2>Thank you for your order 🎉</h2>
-<p>Your order <b>#${order.orderId}</b> has been placed successfully.</p>
-<p>Our agent will contact you shortly to confirm the details and arrange delivery.</p>
-<p>We appreciate your business!</p>`,
+//             subject: "Order Placed Successfully",
+//             html: `<h2>Thank you for your order 🎉</h2>
+// <p>Your order <b>#${order.orderId}</b> has been placed successfully.</p>
+// <p>Our agent will contact you shortly to confirm the details and arrange delivery.</p>
+// <p>We appreciate your business!</p>`,
         });
     } catch (error) {
         console.error("Error sending email:", error);
@@ -128,6 +132,10 @@ export const updateOrder = async (req, res) => {
         let oldStatus = order.status;
 
         order.status = req.body.status;
+        if (req.body.status === "delivered" && order.paymentMethod === "cod") {
+            order.paymentStatus = "paid";
+            order.paidAt = new Date();
+        }
         await order.save();
 
         // if status is pending_payment, Change it to pending payment
